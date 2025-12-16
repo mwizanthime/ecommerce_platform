@@ -120,16 +120,27 @@ export const getAdminAnalytics = async (req, res) => {
       ORDER BY revenue DESC
     `);
 
-    // Get user growth
+    // Get user growth - generate all months even with zero users
     const [userGrowth] = await pool.execute(`
+      WITH RECURSIVE months(month) AS (
+        SELECT DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 11 MONTH), '%Y-%m')
+        UNION ALL
+        SELECT DATE_FORMAT(DATE_ADD(STR_TO_DATE(CONCAT(month, '-01'), '%Y-%m-%d'), INTERVAL 1 MONTH), '%Y-%m')
+        FROM months
+        WHERE STR_TO_DATE(CONCAT(month, '-01'), '%Y-%m-%d') < DATE_FORMAT(NOW(), '%Y-%m-01')
+      )
       SELECT 
-        DATE_FORMAT(created_at, '%Y-%m') as month,
-        COUNT(*) as new_users,
-        SUM(COUNT(*)) OVER (ORDER BY DATE_FORMAT(created_at, '%Y-%m')) as total_users
-      FROM users
-      GROUP BY DATE_FORMAT(created_at, '%Y-%m')
-      ORDER BY month DESC
-      LIMIT 12
+        m.month,
+        COALESCE(COUNT(u.id), 0) as new_users,
+        COALESCE(
+          (SELECT COUNT(*) FROM users u2 
+           WHERE DATE_FORMAT(u2.created_at, '%Y-%m') <= m.month),
+          0
+        ) as total_users
+      FROM months m
+      LEFT JOIN users u ON DATE_FORMAT(u.created_at, '%Y-%m') = m.month
+      GROUP BY m.month
+      ORDER BY m.month DESC
     `);
 
     // Get top sellers

@@ -2,7 +2,7 @@
 import React from 'react';
 
 const ReviewStats = ({ stats, onFilterChange, currentFilters }) => {
-  const { average_rating, total_reviews, rating_distribution } = stats;
+  const { rating, total_reviews, rating_distribution } = stats;
 
   const handleRatingFilter = (rating) => {
     onFilterChange({ 
@@ -15,10 +15,10 @@ const ReviewStats = ({ stats, onFilterChange, currentFilters }) => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Overall Rating */}
         <div className="text-center">
-          <div className="text-4xl font-bold text-gray-900">{average_rating}</div>
+          <div className="text-4xl font-bold text-gray-900">{rating}</div>
           <div className="flex justify-center text-yellow-400 text-lg mt-1">
-            {'★'.repeat(Math.round(parseFloat(average_rating)))}
-            {'☆'.repeat(5 - Math.round(parseFloat(average_rating)))}
+            {'★'.repeat(Math.round(parseFloat(rating)))}
+            {'☆'.repeat(5 - Math.round(parseFloat(rating)))}
           </div>
           <div className="text-sm text-gray-600 mt-1">
             {total_reviews} {total_reviews === 1 ? 'Review' : 'Reviews'}

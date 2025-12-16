@@ -149,3 +149,46 @@ export const deleteCategory = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+
+
+export const getCategoriesWithStats = async (req, res) => {
+  try {
+    const [categories] = await pool.execute(
+      `SELECT c.*, 
+              (SELECT COUNT(*) FROM products WHERE category_id = c.id AND is_published = TRUE) as product_count,
+              (SELECT COUNT(*) FROM category_suggestions WHERE parent_id = c.id AND status = 'pending') as pending_suggestions
+       FROM categories c
+       ORDER BY c.parent_id IS NULL DESC, c.name`
+    );
+
+    // Organize into hierarchy
+    const categoryMap = {};
+    const rootCategories = [];
+
+    categories.forEach(category => {
+      category.subcategories = [];
+      categoryMap[category.id] = category;
+      
+      if (category.parent_id) {
+        if (categoryMap[category.parent_id]) {
+          categoryMap[category.parent_id].subcategories.push(category);
+        }
+      } else {
+        rootCategories.push(category);
+      }
+    });
+
+    res.json({ 
+      success: true,
+      categories: rootCategories 
+    });
+  } catch (error) {
+    console.error('Error fetching categories with stats:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Server error fetching categories', 
+      error: error.message 
+    });
+  }
+};

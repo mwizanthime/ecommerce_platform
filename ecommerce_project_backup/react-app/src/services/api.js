@@ -36,13 +36,13 @@ export const authAPI = {
 
 
 
-// Add to your existing productsAPI object
+
 export const productsAPI = {
   getProducts: (params = {}) => {
     const queryString = new URLSearchParams(params).toString();
     return api.get(`/products${queryString ? `?${queryString}` : ''}`);
   },
-  getSellerProducts: () => api.get('/products/seller/products'), // Add this
+  getSellerProducts: () => api.get('/products/seller/products'),
   getProduct: (id) => api.get(`/products/${id}`),
   createProduct: (data) => api.post('/products', data, {
     headers: {
@@ -50,8 +50,12 @@ export const productsAPI = {
     }
   }),
   updateProduct: (id, data) => {
-    console.log('API: Updating product', id, 'with data:', data);
-    return api.put(`/products/${id}`, data);
+    console.log('API: Updating product with FormData', id);
+    return api.put(`/products/${id}`, data, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
   },
   deleteProduct: (id) => api.delete(`/products/${id}`),
   getFeaturedProducts: () => api.get('/products/featured'),
@@ -60,12 +64,85 @@ export const productsAPI = {
   bulkAdjustStock: (data) => api.patch('/products/stock/bulk', data)
 };
 
+
+// // ADD THE MISSING PAYMENT API EXPORTS HERE
+// export const paymentAPI = {
+//   // Get supported payment methods for a country
+//   getSupportedPaymentMethods: (countryCode) => 
+//     api.get(`/payments/methods?countryCode=${countryCode}`),
+  
+//   // Initiate PawaPay payment
+//   initiatePawaPayPayment: (data) => 
+//     api.post('/payments/pawapay/initiate', data),
+  
+//   // Check payment status for an order
+//   checkPaymentStatus: (orderId) => 
+//     api.get(`/payments/status/${orderId}`),
+  
+//   // Handle payment webhooks (if needed on frontend)
+//   handlePaymentWebhook: (data) => 
+//     api.post('/payments/pawapay/webhook', data),
+  
+//   // Refund payment
+//   refundPayment: (data) => 
+//     api.post('/payments/refund', data),
+
+
+//   initiateStandalonePayment: (data) => 
+//     api.post('/standalone-payments/initiate', data),
+  
+//   checkTransactionStatus: (transactionId) => 
+//     api.get(`/standalone-payments/status/${transactionId}`),
+  
+//   getTransactionHistory: (params = {}) => 
+//     api.get('/standalone-payments/history', { params }),
+  
+//   getSupportedProviders: (countryCode = 'RW') => 
+//     api.get(`/standalone-payments/providers?country=${countryCode}`)
+
+
+// };
+
+
+export const paymentAPI = {
+  // Unified payment initiation
+  initiatePayment: (data) => api.post('/payments/initiate', data),
+  
+  // Check payment status
+  checkPaymentStatus: (type, id) => 
+    api.get(`/payments/status/${type}/${id}`),
+  
+  // Get payment methods
+  getSupportedPaymentMethods: (countryCode = 'RW', paymentType = 'all') => 
+    api.get(`/payments/methods?countryCode=${countryCode}&type=${paymentType}`),
+  
+  // Get payment history
+  getPaymentHistory: (params = {}) => 
+    api.get('/payments/history', { params }),
+  
+  // Get payment by deposit ID
+  getPaymentByDepositId: (depositId) =>
+    api.get(`/payments/deposit/${depositId}`),
+  
+  // Legacy endpoint for backward compatibility
+  initiatePawaPayPayment: (data) => 
+    api.post('/payments/initiate', data),
+  
+  // For orders
+  getOrderPaymentStatus: (orderId) =>
+    api.get(`/payments/status/order/${orderId}`),
+  
+  // For standalone payments
+  getTransactionStatus: (paymentId) =>
+    api.get(`/payments/status/payment/${paymentId}`)
+};
+
+
 // services/api.js - Add analytics endpoints
 export const analyticsAPI = {
   getSellerAnalytics: () => api.get('/analytics/seller'),
   getAdminAnalytics: () => api.get('/analytics/admin')
 };
-
 
 export const couponAPI = {
   getCoupons: () => api.get('/coupons'),
@@ -80,11 +157,28 @@ export const couponAPI = {
 
 export const categoriesAPI = {
   getCategories: () => api.get('/categories'),
+  getCategoriesWithStats: () => axios.get('/api/categories'),
   getCategory: (id) => api.get(`/categories/${id}`),
   createCategory: (data) => api.post('/categories', data),
   updateCategory: (id, data) => api.put(`/categories/${id}`, data),
   deleteCategory: (id) => api.delete(`/categories/${id}`),
 };
+
+
+export const sellerCategoryAPI = {
+  suggestCategory: (data) => api.post('/category-suggestions', data),
+  getCategorySuggestions: (status) => {
+    const params = status ? { status } : {};
+    return api.get('/category-suggestions', { params });
+  },
+  getAdminCategorySuggestions: (status = 'all') => {
+    const params = { status };
+    return api.get('/category-suggestions/admin/all', { params });
+  },
+  deleteSuggestion: (id) => api.delete(`/category-suggestions/${id}`),
+  updateSuggestionStatus: (id, data) => api.patch(`/category-suggestions/${id}/status`, data),
+};
+
 
 export const cartAPI = {
   getCart: () => api.get('/cart'),
@@ -93,23 +187,6 @@ export const cartAPI = {
   removeFromCart: (itemId) => api.delete(`/cart/items/${itemId}`),
   clearCart: () => api.delete('/cart'),
 };
-
-
-
-
-// // Update sellerOrdersAPI with item-level status methods
-// export const sellerOrdersAPI = {
-//   // Get seller's orders
-//   getSellerOrders: () => api.get('/orders/seller/orders'),
-  
-//   // Update order item status (per product)
-//   updateOrderItemStatus: (orderItemId, data) => 
-//     api.patch(`/orders/seller/order-items/${orderItemId}/status`, data),
-  
-//   // Mark order as paid
-//   markOrderAsPaid: (orderId) => 
-//     api.patch(`/orders/seller/orders/${orderId}/mark-paid`),
-// };
 
 
 // Update sellerOrdersAPI with better error handling
@@ -127,29 +204,10 @@ export const sellerOrdersAPI = {
     
   // Get seller order stats
   getSellerOrderStats: () => api.get('/orders/seller/orders/stats'),
-};
-
-
-
-// // Also update ordersAPI as fallback
-// export const ordersAPI = {
-//   getOrders: () => api.get('/orders'),
-//   getOrder: (id) => api.get(`/orders/${id}`),
-//   cancelOrder: (id, data) => api.patch(`/orders/${id}/cancel`, data),
-//   getOrderTracking: (id) => api.get(`/orders/${id}/tracking`),
-//   createOrder: (data) => api.post('/orders', data),
   
-//   // Seller orders methods
-//   getSellerOrders: () => api.get('/orders/seller/orders'),
-//   updateOrderItemStatus: (orderItemId, data) => 
-//     api.patch(`/orders/seller/order-items/${orderItemId}/status`, data),
-//   markOrderAsPaid: (orderId) => 
-//     api.patch(`/orders/seller/orders/${orderId}/mark-paid`),
-// };
-
-
-
-
+  // Get seller order detail
+  getSellerOrderDetail: (orderId) => api.get(`/orders/seller/orders/${orderId}`),
+};
 
 
 // Remove duplicate methods from ordersAPI to avoid confusion
@@ -162,34 +220,6 @@ export const ordersAPI = {
   // Add purchase verification
   checkProductPurchase: (productId) => api.get(`/orders/check-purchase/${productId}`),
 };
-
-// export const reviewsAPI = {
-//   getProductReviews: (productId) => api.get(`/reviews/product/${productId}`),
-//   getUserReview: (productId) => api.get(`/reviews/product/${productId}/user`),
-//   createReview: (data) => api.post('/reviews', data),
-//   updateReview: (id, data) => api.put(`/reviews/${id}`, data),
-//   deleteReview: (id) => api.delete(`/reviews/${id}`),
-// };
-
-// export const reviewsAPI = {
-//   getProductReviews: (productId, params = {}) => {
-//     const queryString = new URLSearchParams(params).toString();
-//     return api.get(`/reviews/product/${productId}${queryString ? `?${queryString}` : ''}`);
-//   },
-//   getUserReview: (productId) => api.get(`/reviews/product/${productId}/user`),
-//   // Add the missing getUserReviews method
-//   getUserReviews: (params = {}) => {
-//     const queryString = new URLSearchParams(params).toString();
-//     return api.get(`/reviews/user${queryString ? `?${queryString}` : ''}`);
-//   },
-//   createReview: (data) => api.post('/reviews', data),
-//   updateReview: (id, data) => api.put(`/reviews/${id}`, data),
-//   deleteReview: (id) => api.delete(`/reviews/${id}`),
-// };
-
-
-
-
 
 export const reviewsAPI = {
   // Get reviews for a specific product
@@ -221,6 +251,16 @@ export const reviewsAPI = {
   getAdminPendingReviews: () => api.get('/reviews/admin/pending'),
   moderateReview: (reviewId, data) => api.patch(`/reviews/${reviewId}/moderate`, data),
   moderateAdminReview: (reviewId, data) => api.patch(`/reviews/admin/${reviewId}/moderate`, data),
+  // getAdminReviewStats: () => api.get('/reviews/admin/statistics'),
+  // Check review eligibility
+  checkReviewEligibility: (productId) => 
+    api.get(`/reviews/product/${productId}/eligibility`),
+
+  getAdminAllReviews: (params = {}) => {
+    const queryString = new URLSearchParams(params).toString();
+    return api.get(`/reviews/admin/all${queryString ? `?${queryString}` : ''}`);
+  },
+  
   getAdminReviewStats: () => api.get('/reviews/admin/statistics'),
 };
 
@@ -230,10 +270,6 @@ export const wishlistAPI = {
   removeFromWishlist: (productId) => api.delete(`/wishlist/${productId}`),
   checkWishlist: (productId) => api.get(`/wishlist/check/${productId}`),
 };
-
-
-
-
 
 export const usersAPI = {
   getUsers: () => api.get('/users'),

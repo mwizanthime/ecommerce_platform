@@ -5,17 +5,17 @@ import { Link } from 'react-router-dom';
 const Footer = () => {
   return (
     <footer className="bg-gray-800 text-white py-8">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-xl font-bold mb-4">ShopEasy</h3>
+            <h3 className="text-xl font-bold mb-4 text-white">ShopEasy</h3>
             <p className="text-gray-400">
               Your one-stop destination for all your shopping needs. Quality products, great prices.
             </p>
           </div>
           
           <div>
-            <h4 className="font-semibold mb-4">Quick Links</h4>
+            <h4 className="font-semibold mb-4 text-white">Quick Links</h4>
             <ul className="space-y-2">
               <li><Link to="/products" className="text-gray-400 hover:text-white">Products</Link></li>
               <li><Link to="/about" className="text-gray-400 hover:text-white">About Us</Link></li>
@@ -25,7 +25,7 @@ const Footer = () => {
           </div>
           
           <div>
-            <h4 className="font-semibold mb-4">Customer Service</h4>
+            <h4 className="font-semibold mb-4 text-white">Customer Service</h4>
             <li><Link to="/shipping" className="text-gray-400 hover:text-white">Shipping Info</Link></li>
 <li><Link to="/returns" className="text-gray-400 hover:text-white">Returns</Link></li>
 <li><Link to="/privacy" className="text-gray-400 hover:text-white">Privacy Policy</Link></li>
@@ -33,10 +33,10 @@ const Footer = () => {
           </div>
           
           <div>
-            <h4 className="font-semibold mb-4">Contact Info</h4>
+            <h4 className="font-semibold mb-4 text-white">Contact Info</h4>
             <ul className="space-y-2 text-gray-400">
               <li>Email: support@shopeasy.com</li>
-              <li>Phone: +1 (555) 123-4567</li>
+              <li>Phone: +250 737 798 270</li>
               <li>Address: 123 Commerce St, City, State 12345</li>
             </ul>
           </div>

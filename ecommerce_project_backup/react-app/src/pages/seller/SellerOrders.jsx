@@ -3879,55 +3879,65 @@ const SellerOrders = () => {
   }, []);
 
   const statusConfig = {
-    pending: { 
-      color: 'bg-amber-50 text-amber-800 border-amber-200', 
-      label: 'Pending',
-      icon: '⏳'
-    },
-    confirmed: { 
-      color: 'bg-blue-50 text-blue-800 border-blue-200', 
-      label: 'Confirmed',
-      icon: '✅'
-    },
-    shipped: { 
-      color: 'bg-indigo-50 text-indigo-800 border-indigo-200', 
-      label: 'Shipped',
-      icon: '🚚'
-    },
-    delivered: { 
-      color: 'bg-emerald-50 text-emerald-800 border-emerald-200', 
-      label: 'Delivered',
-      icon: '📦'
-    },
-    cancelled: { 
-      color: 'bg-rose-50 text-rose-800 border-rose-200', 
-      label: 'Cancelled',
-      icon: '❌'
-    }
-  };
+  pending: { 
+    color: 'bg-amber-50 text-amber-800 border-amber-200', 
+    label: 'Pending',
+    icon: '⏳'
+  },
+  confirmed: { 
+    color: 'bg-blue-50 text-blue-800 border-blue-200', 
+    label: 'Confirmed',
+    icon: '✅'
+  },
+  shipped: { 
+    color: 'bg-indigo-50 text-indigo-800 border-indigo-200', 
+    label: 'Shipped',
+    icon: '🚚'
+  },
+  delivered: { 
+    color: 'bg-emerald-50 text-emerald-800 border-emerald-200', 
+    label: 'Delivered',
+    icon: '📦'
+  },
+  cancelled: { 
+    color: 'bg-rose-50 text-rose-800 border-rose-200', 
+    label: 'Cancelled',
+    icon: '❌'
+  }
+};
 
-  const paymentStatusConfig = {
-    pending: { 
-      color: 'bg-amber-50 text-amber-800 border-amber-200', 
-      label: 'Pending',
-      icon: '⏳'
-    },
-    paid: { 
-      color: 'bg-emerald-50 text-emerald-800 border-emerald-200', 
-      label: 'Paid',
-      icon: '💳'
-    },
-    failed: { 
-      color: 'bg-rose-50 text-rose-800 border-rose-200', 
-      label: 'Failed',
-      icon: '❌'
-    },
-    refunded: { 
-      color: 'bg-slate-100 text-slate-800 border-slate-200', 
-      label: 'Refunded',
-      icon: '↩️'
-    }
-  };
+const paymentStatusConfig = {
+  pending: { 
+    color: 'bg-amber-50 text-amber-800 border-amber-200', 
+    label: 'Pending',
+    icon: '⏳'
+  },
+  processing: { 
+    color: 'bg-blue-50 text-blue-800 border-blue-200', 
+    label: 'Processing',
+    icon: '🔄'
+  },
+  paid: { 
+    color: 'bg-emerald-50 text-emerald-800 border-emerald-200', 
+    label: 'Paid',
+    icon: '💳'
+  },
+  failed: { 
+    color: 'bg-rose-50 text-rose-800 border-rose-200', 
+    label: 'Failed',
+    icon: '❌'
+  },
+  cancelled: { 
+    color: 'bg-slate-100 text-slate-800 border-slate-200', 
+    label: 'Cancelled',
+    icon: '🚫'
+  },
+  refunded: { 
+    color: 'bg-indigo-50 text-indigo-800 border-indigo-200', 
+    label: 'Refunded',
+    icon: '↩️'
+  }
+};
 
   const calculateSellerTotal = useCallback((order) => {
     return order.items?.reduce((total, item) => total + (item.price * item.quantity), 0) || 0;
@@ -3936,7 +3946,7 @@ const SellerOrders = () => {
   const statusFlow = {
     pending: ['confirmed', 'cancelled'],
     confirmed: ['shipped', 'cancelled'],
-    shipped: ['delivered'],
+    shipped: ['delivered','cancelled'],
     delivered: [],
     cancelled: []
   };
@@ -4030,10 +4040,14 @@ const SellerOrders = () => {
                     </div>
                     <div className="flex justify-between items-center py-2 border-b border-slate-100">
                       <span className="text-slate-600 font-medium">Payment Status:</span>
-                      <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium border ${paymentStatusConfig[order.payment_status || 'paid']?.color}`}>
+                      {/* <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium border ${paymentStatusConfig[order.payment_status || 'paid']?.color}`}>
                         <span className="mr-1.5">{paymentStatusConfig[order.payment_status || 'paid']?.icon}</span>
                         {paymentStatusConfig[order.payment_status || 'paid']?.label}
-                      </span>
+                      </span> */}
+                      <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium border ${paymentStatusConfig[order.payment_status]?.color || 'bg-gray-100 text-gray-800 border-gray-200'}`}>
+  <span className="mr-1.5">{paymentStatusConfig[order.payment_status]?.icon || '❓'}</span>
+  {paymentStatusConfig[order.payment_status]?.label || order.payment_status || 'Unknown'}
+</span>
                     </div>
                     <div className="flex justify-between items-center pt-3">
                       <span className="text-slate-700 font-semibold text-lg">Your Total:</span>
@@ -4247,9 +4261,7 @@ const SellerOrders = () => {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
               <div className="flex items-center">
-                {/* <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                  <span className="text-blue-600 font-bold">{orderStats.total}</span>
-                </div> */}
+                
                 <div>
                   <p className="text-sm text-slate-600">Total Orders</p>
                   <p className="font-semibold text-slate-900">{orderStats.total}</p>
@@ -4258,9 +4270,7 @@ const SellerOrders = () => {
             </div>
             <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
               <div className="flex items-center">
-                {/* <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center mr-3">
-                  <span className="text-amber-600 font-bold">{orderStats.pending}</span>
-                </div> */}
+                
                 <div>
                   <p className="text-sm text-slate-600">Pending</p>
                   <p className="font-semibold text-slate-900">{orderStats.pending}</p>
@@ -4413,7 +4423,7 @@ const SellerOrders = () => {
                         View Details
                       </button>
                       
-                      {(order.payment_status === 'pending' || !order.payment_status) && (
+                      {(order.payment_status === 'pending' || order.payment_status === 'processing' || !order.payment_status) && (
                         <button
                           onClick={() => handleMarkAsPaid(order.id)}
                           disabled={markingAsPaid === order.id}

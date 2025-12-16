@@ -69,6 +69,48 @@
 
 
 
+// // backend/routes/products.js
+// import express from 'express';
+// import {
+//   getProducts,
+//   getProduct,
+//   createProduct,
+//   updateProduct,
+//   deleteProduct,
+//   getCategories,
+//   getFeaturedProducts,
+//   adjustStock,
+//   bulkAdjustStock,
+//   getSellerProducts  // Add this import
+// } from '../controllers/productController.js';
+// import { authenticate } from '../middleware/auth.js';
+// import upload from '../middleware/upload.js';
+
+// const router = express.Router();
+
+// // Public routes
+// router.get('/', getProducts);
+// router.get('/categories', getCategories);
+// router.get('/featured', getFeaturedProducts);
+// router.get('/:id', getProduct);
+
+// // Protected routes (seller and admin)
+// router.post('/', authenticate, upload.array('images', 5), createProduct);
+// router.put('/:id', authenticate, updateProduct);
+// router.patch('/:id', authenticate, updateProduct);
+// router.delete('/:id', authenticate, deleteProduct);
+
+// // Seller-specific routes
+// router.get('/seller/products', authenticate, getSellerProducts); // Add this route
+
+// // Stock management routes
+// router.patch('/:id/stock', authenticate, adjustStock);
+// router.patch('/stock/bulk', authenticate, bulkAdjustStock);
+
+// export default router;
+
+
+
 
 import express from 'express';
 import {
@@ -81,7 +123,7 @@ import {
   getFeaturedProducts,
   adjustStock,
   bulkAdjustStock,
-  getSellerProducts  // Add this import
+  getSellerProducts
 } from '../controllers/productController.js';
 import { authenticate } from '../middleware/auth.js';
 import upload from '../middleware/upload.js';
@@ -96,12 +138,13 @@ router.get('/:id', getProduct);
 
 // Protected routes (seller and admin)
 router.post('/', authenticate, upload.array('images', 5), createProduct);
-router.put('/:id', authenticate, updateProduct);
-router.patch('/:id', authenticate, updateProduct);
+// FIX: Add upload middleware to update route
+router.put('/:id', authenticate, upload.array('images', 5), updateProduct);
+router.patch('/:id', authenticate, upload.array('images', 5), updateProduct);
 router.delete('/:id', authenticate, deleteProduct);
 
 // Seller-specific routes
-router.get('/seller/products', authenticate, getSellerProducts); // Add this route
+router.get('/seller/products', authenticate, getSellerProducts);
 
 // Stock management routes
 router.patch('/:id/stock', authenticate, adjustStock);

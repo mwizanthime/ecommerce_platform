@@ -39,13 +39,15 @@ const Home = () => {
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-primary-500 to-primary-600 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <h1 className="text-5xl font-bold mb-6 text-black">Welcome to ShopEasy</h1>
+          <h1 className="text-5xl font-bold mb-6 text-black">Welcome to
+             ShopEasy
+             </h1>
           <p className="text-xl mb-8 max-w-2xl mx-auto text-gray-500">
             Discover amazing products at great prices. Shop with confidence and enjoy fast delivery.
           </p>
           <Link
             to="/products"
-            className="bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors inline-block"
+            className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors inline-block"
           >
             Shop Now
           </Link>

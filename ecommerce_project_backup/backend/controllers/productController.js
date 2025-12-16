@@ -873,7 +873,7 @@
 //   const connection = await pool.getConnection();
   
 //   try {
-//     await connection.beginTransaction();
+//   
 
 //     const {
 //       name,
@@ -908,7 +908,7 @@
 //     );
 
 //     if (existingProducts.length > 0) {
-//       await connection.rollback();
+//       
 //       return res.status(400).json({ 
 //         message: 'A product with this name already exists. Please choose a different name.' 
 //       });
@@ -958,14 +958,14 @@
 //       );
 //     }
 
-//     await connection.commit();
+//     
 
 //     res.status(201).json({
 //       message: 'Product created successfully',
 //       productId: productId
 //     });
 //   } catch (error) {
-//     await connection.rollback();
+//     
 //     console.error('Error creating product:', error);
     
 //     // Clean up uploaded files if product creation fails
@@ -992,7 +992,7 @@
 //   const connection = await pool.getConnection();
   
 //   try {
-//     await connection.beginTransaction();
+//   
 
 //     const { id } = req.params;
 //     const {
@@ -1021,7 +1021,7 @@
 //     );
 
 //     if (products.length === 0) {
-//       await connection.rollback();
+//       
 //       return res.status(404).json({ message: 'Product not found' });
 //     }
 
@@ -1029,7 +1029,7 @@
 
 //     // Check if user owns the product or is admin
 //     if (req.user.role !== 'admin' && product.seller_id !== req.user.id) {
-//       await connection.rollback();
+//       
 //       return res.status(403).json({ message: 'Access denied' });
 //     }
 
@@ -1041,7 +1041,7 @@
 //       );
 
 //       if (existingProducts.length > 0) {
-//         await connection.rollback();
+//         
 //         return res.status(400).json({ 
 //           message: 'A product with this name already exists. Please choose a different name.' 
 //         });
@@ -1078,7 +1078,7 @@
 //     );
 
 //     if (result.affectedRows === 0) {
-//       await connection.rollback();
+//       
 //       return res.status(404).json({ message: 'Product not found' });
 //     }
 
@@ -1096,14 +1096,14 @@
 //       );
 //     }
 
-//     await connection.commit();
+//     
 
 //     res.json({ 
 //       message: 'Product updated successfully',
 //       productId: id 
 //     });
 //   } catch (error) {
-//     await connection.rollback();
+//     
 //     console.error('Error updating product:', error);
     
 //     // Clean up uploaded files if update fails
@@ -1130,7 +1130,7 @@
 //   const connection = await pool.getConnection();
   
 //   try {
-//     await connection.beginTransaction();
+//   
 
 //     const { id } = req.params;
 
@@ -1141,7 +1141,7 @@
 //     );
 
 //     if (products.length === 0) {
-//       await connection.rollback();
+//       
 //       return res.status(404).json({ message: 'Product not found' });
 //     }
 
@@ -1149,7 +1149,7 @@
 
 //     // Check if user owns the product or is admin
 //     if (req.user.role !== 'admin' && product.seller_id !== req.user.id) {
-//       await connection.rollback();
+//       
 //       return res.status(403).json({ message: 'Access denied' });
 //     }
 
@@ -1166,11 +1166,11 @@
 //     const [result] = await connection.execute('DELETE FROM products WHERE id = ?', [id]);
 
 //     if (result.affectedRows === 0) {
-//       await connection.rollback();
+//       
 //       return res.status(404).json({ message: 'Product not found' });
 //     }
 
-//     await connection.commit();
+//     
 
 //     // Clean up image files from server
 //     images.forEach(image => {
@@ -1188,7 +1188,7 @@
 
 //     res.json({ message: 'Product deleted successfully' });
 //   } catch (error) {
-//     await connection.rollback();
+//     
 //     console.error('Error deleting product:', error);
 //     res.status(500).json({ message: 'Server error', error: error.message });
 //   } finally {
@@ -1200,14 +1200,14 @@
 //   const connection = await pool.getConnection();
   
 //   try {
-//     await connection.beginTransaction();
+//   
 
 //     const { id } = req.params;
 //     const { adjustment, reason } = req.body;
 
 //     // Validate adjustment
 //     if (!adjustment || isNaN(adjustment)) {
-//       await connection.rollback();
+//       
 //       return res.status(400).json({ message: 'Valid adjustment value is required' });
 //     }
 
@@ -1218,7 +1218,7 @@
 //     );
 
 //     if (products.length === 0) {
-//       await connection.rollback();
+//       
 //       return res.status(404).json({ message: 'Product not found' });
 //     }
 
@@ -1226,7 +1226,7 @@
 
 //     // Check if user owns the product or is admin
 //     if (req.user.role !== 'admin' && product.seller_id !== req.user.id) {
-//       await connection.rollback();
+//       
 //       return res.status(403).json({ message: 'Access denied' });
 //     }
 
@@ -1235,7 +1235,7 @@
 
 //     // Ensure quantity doesn't go negative
 //     if (newQuantity < 0) {
-//       await connection.rollback();
+//       
 //       return res.status(400).json({ 
 //         message: 'Insufficient stock. Cannot remove more than available quantity.' 
 //       });
@@ -1254,14 +1254,14 @@
 //       [id, adjustment, reason || 'Stock adjustment', req.user.id]
 //     );
 
-//     await connection.commit();
+//     
 
 //     res.json({ 
 //       message: 'Stock adjusted successfully',
 //       newQuantity 
 //     });
 //   } catch (error) {
-//     await connection.rollback();
+//     
 //     console.error('Error adjusting stock:', error);
 //     res.status(500).json({ message: 'Server error', error: error.message });
 //   } finally {
@@ -1622,7 +1622,7 @@
 //   const connection = await pool.getConnection();
   
 //   try {
-//     await connection.beginTransaction();
+//   
 
 //     const {
 //       name,
@@ -1645,7 +1645,7 @@
 
 //     // Validate required fields
 //     if (!name || !price || !category_id) {
-//       await connection.rollback();
+//       
 //       return res.status(400).json({ 
 //         message: 'Name, price, and category are required fields' 
 //       });
@@ -1658,7 +1658,7 @@
 //     );
 
 //     if (existingProducts.length > 0) {
-//       await connection.rollback();
+//       
 //       return res.status(400).json({ 
 //         message: 'A product with this name already exists. Please choose a different name.' 
 //       });
@@ -1707,14 +1707,14 @@
 //       }
 //     }
 
-//     await connection.commit();
+//     
 
 //     res.status(201).json({
 //       message: 'Product created successfully',
 //       productId: productId
 //     });
 //   } catch (error) {
-//     await connection.rollback();
+//     
 //     console.error('Error creating product:', error);
     
 //     // Clean up uploaded files if product creation fails
@@ -1741,7 +1741,7 @@
 //   const connection = await pool.getConnection();
   
 //   try {
-//     await connection.beginTransaction();
+//   
 
 //     const { id } = req.params;
 //     const {
@@ -1770,7 +1770,7 @@
 //     );
 
 //     if (products.length === 0) {
-//       await connection.rollback();
+//       
 //       return res.status(404).json({ message: 'Product not found' });
 //     }
 
@@ -1778,7 +1778,7 @@
 
 //     // Check if user owns the product or is admin
 //     if (req.user.role !== 'admin' && product.seller_id !== req.user.id) {
-//       await connection.rollback();
+//       
 //       return res.status(403).json({ message: 'Access denied' });
 //     }
 
@@ -1790,7 +1790,7 @@
 //       );
 
 //       if (existingProducts.length > 0) {
-//         await connection.rollback();
+//         
 //         return res.status(400).json({ 
 //           message: 'A product with this name already exists. Please choose a different name.' 
 //         });
@@ -1827,7 +1827,7 @@
 //     );
 
 //     if (result.affectedRows === 0) {
-//       await connection.rollback();
+//       
 //       return res.status(404).json({ message: 'Product not found' });
 //     }
 
@@ -1843,14 +1843,14 @@
 //       }
 //     }
 
-//     await connection.commit();
+//     
 
 //     res.json({ 
 //       message: 'Product updated successfully',
 //       productId: id 
 //     });
 //   } catch (error) {
-//     await connection.rollback();
+//     
 //     console.error('Error updating product:', error);
     
 //     // Clean up uploaded files if update fails
@@ -1877,7 +1877,7 @@
 //   const connection = await pool.getConnection();
   
 //   try {
-//     await connection.beginTransaction();
+//   
 
 //     const { id } = req.params;
 
@@ -1888,7 +1888,7 @@
 //     );
 
 //     if (products.length === 0) {
-//       await connection.rollback();
+//       
 //       return res.status(404).json({ message: 'Product not found' });
 //     }
 
@@ -1896,7 +1896,7 @@
 
 //     // Check if user owns the product or is admin
 //     if (req.user.role !== 'admin' && product.seller_id !== req.user.id) {
-//       await connection.rollback();
+//       
 //       return res.status(403).json({ message: 'Access denied' });
 //     }
 
@@ -1913,11 +1913,11 @@
 //     const [result] = await connection.execute('DELETE FROM products WHERE id = ?', [id]);
 
 //     if (result.affectedRows === 0) {
-//       await connection.rollback();
+//       
 //       return res.status(404).json({ message: 'Product not found' });
 //     }
 
-//     await connection.commit();
+//     
 
 //     // Clean up image files from server
 //     images.forEach(image => {
@@ -1935,7 +1935,7 @@
 
 //     res.json({ message: 'Product deleted successfully' });
 //   } catch (error) {
-//     await connection.rollback();
+//     
 //     console.error('Error deleting product:', error);
 //     res.status(500).json({ message: 'Server error', error: error.message });
 //   } finally {
@@ -1947,14 +1947,14 @@
 //   const connection = await pool.getConnection();
   
 //   try {
-//     await connection.beginTransaction();
+//   
 
 //     const { id } = req.params;
 //     const { adjustment, reason } = req.body;
 
 //     // Validate adjustment
 //     if (!adjustment || isNaN(adjustment)) {
-//       await connection.rollback();
+//       
 //       return res.status(400).json({ message: 'Valid adjustment value is required' });
 //     }
 
@@ -1965,7 +1965,7 @@
 //     );
 
 //     if (products.length === 0) {
-//       await connection.rollback();
+//       
 //       return res.status(404).json({ message: 'Product not found' });
 //     }
 
@@ -1973,7 +1973,7 @@
 
 //     // Check if user owns the product or is admin
 //     if (req.user.role !== 'admin' && product.seller_id !== req.user.id) {
-//       await connection.rollback();
+//       
 //       return res.status(403).json({ message: 'Access denied' });
 //     }
 
@@ -1982,7 +1982,7 @@
 
 //     // Ensure quantity doesn't go negative
 //     if (newQuantity < 0) {
-//       await connection.rollback();
+//       
 //       return res.status(400).json({ 
 //         message: 'Insufficient stock. Cannot remove more than available quantity.' 
 //       });
@@ -2001,14 +2001,14 @@
 //       [id, adjustment, reason || 'Stock adjustment', req.user.id]
 //     );
 
-//     await connection.commit();
+//     
 
 //     res.json({ 
 //       message: 'Stock adjusted successfully',
 //       newQuantity 
 //     });
 //   } catch (error) {
-//     await connection.rollback();
+//     
 //     console.error('Error adjusting stock:', error);
 //     res.status(500).json({ message: 'Server error', error: error.message });
 //   } finally {
@@ -2308,7 +2308,7 @@
 //   const connection = await pool.getConnection();
   
 //   try {
-//     await connection.beginTransaction();
+//   
 
 //     const {
 //       name,
@@ -2325,7 +2325,7 @@
 
 //     // Validate required fields
 //     if (!name || !description || !price || !category_id) {
-//       await connection.rollback();
+//       
 //       return res.status(400).json({ 
 //         message: 'Name, description, price, and category are required' 
 //       });
@@ -2354,7 +2354,7 @@
 //       }
 //     }
 
-//     await connection.commit();
+//     
 
 //     // Return the created product
 //     const [newProduct] = await pool.execute(
@@ -2384,7 +2384,7 @@
 //     });
 
 //   } catch (error) {
-//     await connection.rollback();
+//     
 //     console.error('Error in createProduct:', error);
 //     res.status(500).json({ 
 //       message: 'Server error creating product', 
@@ -2399,7 +2399,7 @@
 // //   const connection = await pool.getConnection();
   
 // //   try {
-// //     await connection.beginTransaction();
+// //   
 
 // //     const { id } = req.params;
 // //     const {
@@ -2420,7 +2420,7 @@
 // //     );
 
 // //     if (existingProducts.length === 0) {
-// //       await connection.rollback();
+// //       
 // //       return res.status(404).json({ 
 // //         message: 'Product not found or you do not have permission to update it' 
 // //       });
@@ -2436,11 +2436,11 @@
 // //     );
 
 // //     if (result.affectedRows === 0) {
-// //       await connection.rollback();
+// //       
 // //       return res.status(404).json({ message: 'Product not found' });
 // //     }
 
-// //     await connection.commit();
+// //     
 
 // //     // Return updated product
 // //     const [updatedProduct] = await pool.execute(
@@ -2470,7 +2470,7 @@
 // //     });
 
 // //   } catch (error) {
-// //     await connection.rollback();
+// //     
 // //     console.error('Error in updateProduct:', error);
 // //     res.status(500).json({ 
 // //       message: 'Server error updating product', 
@@ -2488,7 +2488,7 @@
 //   const connection = await pool.getConnection();
   
 //   try {
-//     await connection.beginTransaction();
+//   
 
 //     const { id } = req.params;
 //     const {
@@ -2533,7 +2533,7 @@
 //     }
 
 //     if (existingProducts.length === 0) {
-//       await connection.rollback();
+//       
       
 //       // More detailed error message
 //       const [anyProduct] = await pool.execute('SELECT * FROM products WHERE id = ?', [id]);
@@ -2572,7 +2572,7 @@
 //     updateFields.push('updated_at = CURRENT_TIMESTAMP');
 
 //     if (updateFields.length === 0) {
-//       await connection.rollback();
+//       
 //       return res.status(400).json({ message: 'No fields to update' });
 //     }
 
@@ -2587,11 +2587,11 @@
 //     const [result] = await connection.execute(updateQuery, updateValues);
 
 //     if (result.affectedRows === 0) {
-//       await connection.rollback();
+//       
 //       return res.status(404).json({ message: 'Product not found during update' });
 //     }
 
-//     await connection.commit();
+//     
 
 //     console.log('Product updated successfully');
 
@@ -2640,7 +2640,7 @@
 //     });
 
 //   } catch (error) {
-//     await connection.rollback();
+//     
 //     console.error('Error in updateProduct:', error);
 //     res.status(500).json({ 
 //       message: 'Server error updating product', 
@@ -2656,7 +2656,7 @@
 //   const connection = await pool.getConnection();
   
 //   try {
-//     await connection.beginTransaction();
+//   
 
 //     const { id } = req.params;
 
@@ -2672,7 +2672,7 @@
 //     const [existingProducts] = await connection.execute(checkQuery, checkParams);
 
 //     if (existingProducts.length === 0) {
-//       await connection.rollback();
+//       
 //       return res.status(404).json({ 
 //         message: 'Product not found or you do not have permission to delete it' 
 //       });
@@ -2685,11 +2685,11 @@
 //     const [result] = await connection.execute('DELETE FROM products WHERE id = ?', [id]);
 
 //     if (result.affectedRows === 0) {
-//       await connection.rollback();
+//       
 //       return res.status(404).json({ message: 'Product not found' });
 //     }
 
-//     await connection.commit();
+//     
 
 //     res.json({ 
 //       message: 'Product deleted successfully',
@@ -2697,7 +2697,7 @@
 //     });
 
 //   } catch (error) {
-//     await connection.rollback();
+//     
 //     console.error('Error in deleteProduct:', error);
 //     res.status(500).json({ 
 //       message: 'Server error deleting product', 
@@ -2770,13 +2770,13 @@
 //   const connection = await pool.getConnection();
   
 //   try {
-//     await connection.beginTransaction();
+//   
 
 //     const { id } = req.params;
 //     const { quantity, action = 'decrease' } = req.body; // action: 'increase' or 'decrease'
 
 //     if (!quantity || quantity <= 0) {
-//       await connection.rollback();
+//       
 //       return res.status(400).json({ 
 //         message: 'Valid quantity is required' 
 //       });
@@ -2789,7 +2789,7 @@
 //     );
 
 //     if (products.length === 0) {
-//       await connection.rollback();
+//       
 //       return res.status(404).json({ message: 'Product not found' });
 //     }
 
@@ -2800,7 +2800,7 @@
 //     if (action === 'decrease') {
 //       // Check if enough stock is available
 //       if (currentStock < quantity) {
-//         await connection.rollback();
+//         
 //         return res.status(400).json({ 
 //           message: `Insufficient stock. Available: ${currentStock}, Requested: ${quantity}` 
 //         });
@@ -2809,7 +2809,7 @@
 //     } else if (action === 'increase') {
 //       newStock = currentStock + quantity;
 //     } else {
-//       await connection.rollback();
+//       
 //       return res.status(400).json({ 
 //         message: 'Invalid action. Use "increase" or "decrease"' 
 //       });
@@ -2822,11 +2822,11 @@
 //     );
 
 //     if (result.affectedRows === 0) {
-//       await connection.rollback();
+//       
 //       return res.status(404).json({ message: 'Product not found' });
 //     }
 
-//     await connection.commit();
+//     
 
 //     res.json({
 //       message: `Stock ${action}d successfully`,
@@ -2837,7 +2837,7 @@
 //     });
 
 //   } catch (error) {
-//     await connection.rollback();
+//     
 //     console.error('Error in adjustStock:', error);
 //     res.status(500).json({ 
 //       message: 'Server error adjusting stock', 
@@ -2853,12 +2853,12 @@
 //   const connection = await pool.getConnection();
   
 //   try {
-//     await connection.beginTransaction();
+//   
 
 //     const { adjustments } = req.body; // Array of { productId, quantity, action }
 
 //     if (!Array.isArray(adjustments) || adjustments.length === 0) {
-//       await connection.rollback();
+//       
 //       return res.status(400).json({ 
 //         message: 'Adjustments array is required' 
 //       });
@@ -2925,7 +2925,7 @@
 
 //     // If there are any errors, rollback the entire transaction
 //     if (errors.length > 0) {
-//       await connection.rollback();
+//       
 //       return res.status(400).json({
 //         message: 'Some stock adjustments failed',
 //         successful: results,
@@ -2933,7 +2933,7 @@
 //       });
 //     }
 
-//     await connection.commit();
+//     
 
 //     res.json({
 //       message: 'All stock adjustments completed successfully',
@@ -2941,7 +2941,7 @@
 //     });
 
 //   } catch (error) {
-//     await connection.rollback();
+//     
 //     console.error('Error in bulkAdjustStock:', error);
 //     res.status(500).json({ 
 //       message: 'Server error adjusting stock', 
@@ -3146,51 +3146,51 @@ export const getProducts = async (req, res) => {
 };
 
 // Get seller's products only
-export const getSellerProducts = async (req, res) => {
-  try {
-    console.log('=== GET SELLER PRODUCTS ===');
-    console.log('Seller ID:', req.user.id);
+// export const getSellerProducts = async (req, res) => {
+//   try {
+//     console.log('=== GET SELLER PRODUCTS ===');
+//     console.log('Seller ID:', req.user.id);
     
-    const [products] = await pool.execute(
-      `SELECT 
-        p.*, 
-        c.name as category_name,
-        u.username as seller_name,
-        pi.image_url as primary_image
-       FROM products p
-       LEFT JOIN categories c ON p.category_id = c.id
-       LEFT JOIN users u ON p.seller_id = u.id
-       LEFT JOIN product_images pi ON p.id = pi.product_id AND pi.is_primary = TRUE
-       WHERE p.seller_id = ?
-       ORDER BY p.created_at DESC`,
-      [req.user.id]
-    );
+//     const [products] = await pool.execute(
+//       `SELECT 
+//         p.*, 
+//         c.name as category_name,
+//         u.username as seller_name,
+//         pi.image_url as primary_image
+//        FROM products p
+//        LEFT JOIN categories c ON p.category_id = c.id
+//        LEFT JOIN users u ON p.seller_id = u.id
+//        LEFT JOIN product_images pi ON p.id = pi.product_id AND pi.is_primary = TRUE
+//        WHERE p.seller_id = ?
+//        ORDER BY p.created_at DESC`,
+//       [req.user.id]
+//     );
 
-    console.log(`Found ${products.length} products for seller ${req.user.id}`);
+//     console.log(`Found ${products.length} products for seller ${req.user.id}`);
 
-    const formattedProducts = products.map(product => ({
-      ...product,
-      price: parseFloat(product.price) || 0,
-      quantity: parseInt(product.quantity) || 0,
-      primary_image: product.primary_image 
-        ? formatImageUrl(product.primary_image)
-        : `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/placeholder/300/300`
-    }));
+//     const formattedProducts = products.map(product => ({
+//       ...product,
+//       price: parseFloat(product.price) || 0,
+//       quantity: parseInt(product.quantity) || 0,
+//       primary_image: product.primary_image 
+//         ? formatImageUrl(product.primary_image)
+//         : `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/placeholder/300/300`
+//     }));
 
-    res.json({ 
-      success: true,
-      products: formattedProducts 
-    });
+//     res.json({ 
+//       success: true,
+//       products: formattedProducts 
+//     });
 
-  } catch (error) {
-    console.error('Get seller products error:', error);
-    res.status(500).json({ 
-      success: false,
-      message: 'Server error fetching seller products', 
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
-    });
-  }
-};
+//   } catch (error) {
+//     console.error('Get seller products error:', error);
+//     res.status(500).json({ 
+//       success: false,
+//       message: 'Server error fetching seller products', 
+//       error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+//     });
+//   }
+// };
 
 export const getProduct = async (req, res) => {
   try {
@@ -3289,7 +3289,7 @@ export const createProduct = async (req, res) => {
   const connection = await pool.getConnection();
   
   try {
-    await connection.beginTransaction();
+
 
     const {
       name,
@@ -3318,7 +3318,7 @@ export const createProduct = async (req, res) => {
 
     // Validate required fields
     if (!name || !description || !price || !category_id) {
-      await connection.rollback();
+      
       return res.status(400).json({ 
         message: 'Name, description, price, and category are required' 
       });
@@ -3351,7 +3351,7 @@ export const createProduct = async (req, res) => {
       }
     }
 
-    await connection.commit();
+    
 
     // Return the created product
     const [newProduct] = await pool.execute(
@@ -3381,7 +3381,7 @@ export const createProduct = async (req, res) => {
     });
 
   } catch (error) {
-    await connection.rollback();
+    
     console.error('Error in createProduct:', error);
     res.status(500).json({ 
       message: 'Server error creating product', 
@@ -3392,37 +3392,223 @@ export const createProduct = async (req, res) => {
   }
 };
 
+// export const updateProduct = async (req, res) => {
+//   const connection = await pool.getConnection();
+  
+//   try {
+
+
+//     const { id } = req.params;
+//     const {
+//       name,
+//       description,
+//       price,
+//       quantity,
+//       category_id,
+//       sku,
+//       is_featured,
+//       is_published,
+//       compare_price,
+//       cost_per_item,
+//       barcode,
+//       track_quantity,
+//       requires_shipping,
+//       weight,
+//       seo_title,
+//       seo_description
+//     } = req.body;
+
+//     console.log('=== UPDATE PRODUCT ===');
+//     console.log('Product ID:', id);
+//     console.log('Current user ID:', req.user.id);
+//     console.log('User role:', req.user.role);
+//     console.log('Update data:', req.body);
+
+//     // Check if product exists and belongs to seller (or if admin)
+//     let query = 'SELECT * FROM products WHERE id = ?';
+//     const params = [id];
+
+//     if (req.user.role !== 'admin') {
+//       query += ' AND seller_id = ?';
+//       params.push(req.user.id);
+//     }
+
+//     const [existingProducts] = await connection.execute(query, params);
+
+//     console.log('Existing products found:', existingProducts.length);
+//     if (existingProducts.length > 0) {
+//       console.log('Product seller_id:', existingProducts[0].seller_id);
+//     }
+
+//     if (existingProducts.length === 0) {
+      
+      
+//       // More detailed error message
+//       const [anyProduct] = await pool.execute('SELECT * FROM products WHERE id = ?', [id]);
+//       if (anyProduct.length === 0) {
+//         return res.status(404).json({ 
+//           message: 'Product not found' 
+//         });
+//       } else {
+//         return res.status(403).json({ 
+//           message: 'You do not have permission to update this product. Product belongs to another seller.' 
+//         });
+//       }
+//     }
+
+//     // Build dynamic update query
+//     const updateFields = [];
+//     const updateValues = [];
+
+//     if (name !== undefined) {
+//       updateFields.push('name = ?');
+//       updateValues.push(name);
+//     }
+//     if (description !== undefined) {
+//       updateFields.push('description = ?');
+//       updateValues.push(description);
+//     }
+//     if (price !== undefined) {
+//       updateFields.push('price = ?');
+//       updateValues.push(parseFloat(price));
+//     }
+//     if (quantity !== undefined) {
+//       updateFields.push('quantity = ?');
+//       updateValues.push(parseInt(quantity));
+//     }
+//     if (category_id !== undefined) {
+//       updateFields.push('category_id = ?');
+//       updateValues.push(category_id);
+//     }
+//     if (sku !== undefined) {
+//       updateFields.push('sku = ?');
+//       updateValues.push(sku);
+//     }
+//     if (is_featured !== undefined) {
+//       updateFields.push('is_featured = ?');
+//       updateValues.push(is_featured ? 1 : 0);
+//     }
+//     if (is_published !== undefined) {
+//       updateFields.push('is_published = ?');
+//       updateValues.push(is_published ? 1 : 0);
+//     }
+//     if (compare_price !== undefined) {
+//       updateFields.push('compare_price = ?');
+//       updateValues.push(compare_price ? parseFloat(compare_price) : null);
+//     }
+//     if (cost_per_item !== undefined) {
+//       updateFields.push('cost_per_item = ?');
+//       updateValues.push(cost_per_item ? parseFloat(cost_per_item) : null);
+//     }
+//     if (barcode !== undefined) {
+//       updateFields.push('barcode = ?');
+//       updateValues.push(barcode);
+//     }
+//     if (track_quantity !== undefined) {
+//       updateFields.push('track_quantity = ?');
+//       updateValues.push(track_quantity ? 1 : 0);
+//     }
+//     if (requires_shipping !== undefined) {
+//       updateFields.push('requires_shipping = ?');
+//       updateValues.push(requires_shipping ? 1 : 0);
+//     }
+//     if (weight !== undefined) {
+//       updateFields.push('weight = ?');
+//       updateValues.push(weight ? parseFloat(weight) : null);
+//     }
+//     if (seo_title !== undefined) {
+//       updateFields.push('seo_title = ?');
+//       updateValues.push(seo_title);
+//     }
+//     if (seo_description !== undefined) {
+//       updateFields.push('seo_description = ?');
+//       updateValues.push(seo_description);
+//     }
+
+//     // Always update the updated_at timestamp
+//     updateFields.push('updated_at = CURRENT_TIMESTAMP');
+
+//     if (updateFields.length === 0) {
+      
+//       return res.status(400).json({ message: 'No fields to update' });
+//     }
+
+//     // Add the product ID to the values array
+//     updateValues.push(id);
+
+//     const updateQuery = `UPDATE products SET ${updateFields.join(', ')} WHERE id = ?`;
+
+//     console.log('Final update query:', updateQuery);
+//     console.log('Update values:', updateValues);
+
+//     const [result] = await connection.execute(updateQuery, updateValues);
+
+//     if (result.affectedRows === 0) {
+      
+//       return res.status(404).json({ message: 'Product not found during update' });
+//     }
+
+    
+
+//     console.log('Product updated successfully');
+
+//     // Return updated product
+//     const [updatedProduct] = await pool.execute(
+//       `SELECT 
+//         p.*, 
+//         c.name as category_name,
+//         u.username as seller_name,
+//         pi.image_url as primary_image
+//        FROM products p
+//        LEFT JOIN categories c ON p.category_id = c.id
+//        LEFT JOIN users u ON p.seller_id = u.id
+//        LEFT JOIN product_images pi ON p.id = pi.product_id AND pi.is_primary = TRUE
+//        WHERE p.id = ?`,
+//       [id]
+//     );
+
+//     if (updatedProduct.length === 0) {
+//       return res.status(404).json({ message: 'Updated product not found' });
+//     }
+
+//     const formattedProduct = {
+//       ...updatedProduct[0],
+//       primary_image: updatedProduct[0].primary_image 
+//         ? formatImageUrl(updatedProduct[0].primary_image)
+//         : `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/placeholder/300/300`
+//     };
+
+//     res.json({
+//       message: 'Product updated successfully',
+//       product: formattedProduct
+//     });
+
+//   } catch (error) {
+    
+//     console.error('Error in updateProduct:', error);
+//     res.status(500).json({ 
+//       message: 'Server error updating product', 
+//       error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+//     });
+//   }
+// };
+
+
+
+// Add this function to your products controller
+
+
 export const updateProduct = async (req, res) => {
   const connection = await pool.getConnection();
   
   try {
-    await connection.beginTransaction();
-
     const { id } = req.params;
-    const {
-      name,
-      description,
-      price,
-      quantity,
-      category_id,
-      sku,
-      is_featured,
-      is_published,
-      compare_price,
-      cost_per_item,
-      barcode,
-      track_quantity,
-      requires_shipping,
-      weight,
-      seo_title,
-      seo_description
-    } = req.body;
-
+    
     console.log('=== UPDATE PRODUCT ===');
     console.log('Product ID:', id);
     console.log('Current user ID:', req.user.id);
-    console.log('User role:', req.user.role);
-    console.log('Update data:', req.body);
+    console.log('Update data (body):', req.body);
+    console.log('Update files:', req.files);
 
     // Check if product exists and belongs to seller (or if admin)
     let query = 'SELECT * FROM products WHERE id = ?';
@@ -3435,101 +3621,56 @@ export const updateProduct = async (req, res) => {
 
     const [existingProducts] = await connection.execute(query, params);
 
-    console.log('Existing products found:', existingProducts.length);
-    if (existingProducts.length > 0) {
-      console.log('Product seller_id:', existingProducts[0].seller_id);
-    }
-
     if (existingProducts.length === 0) {
-      await connection.rollback();
-      
-      // More detailed error message
       const [anyProduct] = await pool.execute('SELECT * FROM products WHERE id = ?', [id]);
       if (anyProduct.length === 0) {
-        return res.status(404).json({ 
-          message: 'Product not found' 
-        });
+        return res.status(404).json({ message: 'Product not found' });
       } else {
-        return res.status(403).json({ 
-          message: 'You do not have permission to update this product. Product belongs to another seller.' 
-        });
+        return res.status(403).json({ message: 'You do not have permission to update this product' });
       }
     }
+
+    // Parse FormData fields
+    const {
+      name, description, price, quantity, category_id, sku,
+      is_featured, is_published, compare_price, cost_per_item,
+      barcode, track_quantity, requires_shipping, weight,
+      seo_title, seo_description
+    } = req.body;
 
     // Build dynamic update query
     const updateFields = [];
     const updateValues = [];
 
-    if (name !== undefined) {
-      updateFields.push('name = ?');
-      updateValues.push(name);
-    }
-    if (description !== undefined) {
-      updateFields.push('description = ?');
-      updateValues.push(description);
-    }
-    if (price !== undefined) {
-      updateFields.push('price = ?');
-      updateValues.push(parseFloat(price));
-    }
-    if (quantity !== undefined) {
-      updateFields.push('quantity = ?');
-      updateValues.push(parseInt(quantity));
-    }
-    if (category_id !== undefined) {
-      updateFields.push('category_id = ?');
-      updateValues.push(category_id);
-    }
-    if (sku !== undefined) {
-      updateFields.push('sku = ?');
-      updateValues.push(sku);
-    }
-    if (is_featured !== undefined) {
-      updateFields.push('is_featured = ?');
-      updateValues.push(is_featured ? 1 : 0);
-    }
-    if (is_published !== undefined) {
-      updateFields.push('is_published = ?');
-      updateValues.push(is_published ? 1 : 0);
-    }
-    if (compare_price !== undefined) {
-      updateFields.push('compare_price = ?');
-      updateValues.push(compare_price ? parseFloat(compare_price) : null);
-    }
-    if (cost_per_item !== undefined) {
-      updateFields.push('cost_per_item = ?');
-      updateValues.push(cost_per_item ? parseFloat(cost_per_item) : null);
-    }
-    if (barcode !== undefined) {
-      updateFields.push('barcode = ?');
-      updateValues.push(barcode);
-    }
-    if (track_quantity !== undefined) {
-      updateFields.push('track_quantity = ?');
-      updateValues.push(track_quantity ? 1 : 0);
-    }
-    if (requires_shipping !== undefined) {
-      updateFields.push('requires_shipping = ?');
-      updateValues.push(requires_shipping ? 1 : 0);
-    }
-    if (weight !== undefined) {
-      updateFields.push('weight = ?');
-      updateValues.push(weight ? parseFloat(weight) : null);
-    }
-    if (seo_title !== undefined) {
-      updateFields.push('seo_title = ?');
-      updateValues.push(seo_title);
-    }
-    if (seo_description !== undefined) {
-      updateFields.push('seo_description = ?');
-      updateValues.push(seo_description);
-    }
+    // Helper function to handle field updates
+    const addField = (field, value, transform = null) => {
+      if (value !== undefined && value !== null && value !== '') {
+        updateFields.push(`${field} = ?`);
+        updateValues.push(transform ? transform(value) : value);
+      }
+    };
+
+    addField('name', name);
+    addField('description', description);
+    addField('price', price, val => parseFloat(val));
+    addField('quantity', quantity, val => parseInt(val));
+    addField('category_id', category_id, val => parseInt(val));
+    addField('sku', sku);
+    addField('barcode', barcode);
+    addField('is_featured', is_featured, val => val === '1' || val === 'true' ? 1 : 0);
+    addField('is_published', is_published, val => val === '1' || val === 'true' ? 1 : 0);
+    addField('compare_price', compare_price, val => val ? parseFloat(val) : null);
+    addField('cost_per_item', cost_per_item, val => val ? parseFloat(val) : null);
+    addField('track_quantity', track_quantity, val => val === '1' || val === 'true' ? 1 : 0);
+    addField('requires_shipping', requires_shipping, val => val === '1' || val === 'true' ? 1 : 0);
+    addField('weight', weight, val => val ? parseFloat(val) : null);
+    addField('seo_title', seo_title);
+    addField('seo_description', seo_description);
 
     // Always update the updated_at timestamp
     updateFields.push('updated_at = CURRENT_TIMESTAMP');
 
     if (updateFields.length === 0) {
-      await connection.rollback();
       return res.status(400).json({ message: 'No fields to update' });
     }
 
@@ -3537,23 +3678,48 @@ export const updateProduct = async (req, res) => {
     updateValues.push(id);
 
     const updateQuery = `UPDATE products SET ${updateFields.join(', ')} WHERE id = ?`;
-
     console.log('Final update query:', updateQuery);
-    console.log('Update values:', updateValues);
 
     const [result] = await connection.execute(updateQuery, updateValues);
 
     if (result.affectedRows === 0) {
-      await connection.rollback();
       return res.status(404).json({ message: 'Product not found during update' });
     }
 
-    await connection.commit();
+    // **FIX: Handle image uploads properly**
+    if (req.files && req.files.length > 0) {
+      console.log('Processing', req.files.length, 'new images');
+      
+      // Delete existing images
+      await connection.execute('DELETE FROM product_images WHERE product_id = ?', [id]);
+      
+      // Insert new images with proper path
+      for (let i = 0; i < req.files.length; i++) {
+        const image = req.files[i];
+        const isPrimary = i === 0 ? 1 : 0;
+        
+        // **FIX: Store with /uploads/ prefix**
+        const imagePath = `/uploads/${image.filename}`;
+        
+        console.log(`Storing image ${i+1}:`, {
+          filename: image.filename,
+          path: imagePath,
+          isPrimary: isPrimary
+        });
+        
+        await connection.execute(
+          'INSERT INTO product_images (product_id, image_url, is_primary) VALUES (?, ?, ?)',
+          [id, imagePath, isPrimary]
+        );
+      }
+    } else {
+      console.log('No new images to process');
+    }
 
     console.log('Product updated successfully');
 
-    // Return updated product
-    const [updatedProduct] = await pool.execute(
+    // Return updated product with proper image URL
+    const [updatedProduct] = await connection.execute(
       `SELECT 
         p.*, 
         c.name as category_name,
@@ -3571,12 +3737,13 @@ export const updateProduct = async (req, res) => {
       return res.status(404).json({ message: 'Updated product not found' });
     }
 
+    // **FIX: Use the formatImageUrl function properly**
     const formattedProduct = {
       ...updatedProduct[0],
-      primary_image: updatedProduct[0].primary_image 
-        ? formatImageUrl(updatedProduct[0].primary_image)
-        : `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/placeholder/300/300`
+      primary_image: formatImageUrl(updatedProduct[0].primary_image)
     };
+
+    console.log('Returning updated product:', formattedProduct);
 
     res.json({
       message: 'Product updated successfully',
@@ -3584,23 +3751,72 @@ export const updateProduct = async (req, res) => {
     });
 
   } catch (error) {
-    await connection.rollback();
     console.error('Error in updateProduct:', error);
     res.status(500).json({ 
       message: 'Server error updating product', 
       error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
     });
   } finally {
-    connection.release();
+    if (connection) {
+      connection.release();
+    }
   }
 };
 
+
+export const getSellerProducts = async (req, res) => {
+  const connection = await pool.getConnection();
+  
+  try {
+    const sellerId = req.user.id; // Assuming user ID is available from auth middleware
+
+    // Modified query to include order information
+    const query = `
+      SELECT 
+        p.*,
+        c.name as category_name,
+        pi.image_url as primary_image,
+        (SELECT COUNT(*) FROM order_items WHERE product_id = p.id) as order_count,
+        CASE 
+          WHEN (SELECT COUNT(*) FROM order_items WHERE product_id = p.id) > 0 THEN TRUE 
+          ELSE FALSE 
+        END as has_orders
+      FROM products p
+      LEFT JOIN categories c ON p.category_id = c.id
+      LEFT JOIN product_images pi ON p.id = pi.product_id AND pi.is_primary = 1
+      WHERE p.seller_id = ?
+      ORDER BY p.created_at DESC
+    `;
+
+    const [products] = await connection.execute(query, [sellerId]);
+
+    // Transform the data if needed
+    const transformedProducts = products.map(product => ({
+      ...product,
+      has_orders: Boolean(product.has_orders), // Ensure it's a boolean
+      order_count: parseInt(product.order_count) // Ensure it's a number
+    }));
+
+    res.json({ 
+      success: true,
+      products: transformedProducts 
+    });
+
+  } catch (error) {
+    console.error('Error fetching seller products:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Server error fetching products', 
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
+  }
+};
+
+// Your existing deleteProduct function remains the same
 export const deleteProduct = async (req, res) => {
   const connection = await pool.getConnection();
   
   try {
-    await connection.beginTransaction();
-
     const { id } = req.params;
 
     // Check if product exists and belongs to seller (or admin)
@@ -3615,9 +3831,21 @@ export const deleteProduct = async (req, res) => {
     const [existingProducts] = await connection.execute(checkQuery, checkParams);
 
     if (existingProducts.length === 0) {
-      await connection.rollback();
       return res.status(404).json({ 
         message: 'Product not found or you do not have permission to delete it' 
+      });
+    }
+
+    // Check if product has any orders
+    const [orderItems] = await connection.execute(
+      'SELECT COUNT(*) as count FROM order_items WHERE product_id = ?',
+      [id]
+    );
+    
+    if (orderItems[0].count > 0) {
+      return res.status(400).json({ 
+        message: 'Cannot delete product because it has orders. You can archive the product instead.',
+        has_orders: true
       });
     }
 
@@ -3628,11 +3856,8 @@ export const deleteProduct = async (req, res) => {
     const [result] = await connection.execute('DELETE FROM products WHERE id = ?', [id]);
 
     if (result.affectedRows === 0) {
-      await connection.rollback();
       return res.status(404).json({ message: 'Product not found' });
     }
-
-    await connection.commit();
 
     res.json({ 
       message: 'Product deleted successfully',
@@ -3640,16 +3865,142 @@ export const deleteProduct = async (req, res) => {
     });
 
   } catch (error) {
-    await connection.rollback();
     console.error('Error in deleteProduct:', error);
     res.status(500).json({ 
       message: 'Server error deleting product', 
       error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
     });
-  } finally {
-    connection.release();
-  }
+  } 
 };
+
+
+
+
+
+
+// export const deleteProduct = async (req, res) => {
+//   const connection = await pool.getConnection();
+  
+//   try {
+
+
+//     const { id } = req.params;
+
+//     // Check if product exists and belongs to seller (or admin)
+//     let checkQuery = 'SELECT * FROM products WHERE id = ?';
+//     const checkParams = [id];
+
+//     if (req.user.role !== 'admin') {
+//       checkQuery += ' AND seller_id = ?';
+//       checkParams.push(req.user.id);
+//     }
+
+//     const [existingProducts] = await connection.execute(checkQuery, checkParams);
+
+//     if (existingProducts.length === 0) {
+      
+//       return res.status(404).json({ 
+//         message: 'Product not found or you do not have permission to delete it' 
+//       });
+//     }
+
+//     // Delete product images first (due to foreign key constraint)
+//     await connection.execute('DELETE FROM product_images WHERE product_id = ?', [id]);
+
+//     // Delete product
+//     const [result] = await connection.execute('DELETE FROM products WHERE id = ?', [id]);
+
+//     if (result.affectedRows === 0) {
+      
+//       return res.status(404).json({ message: 'Product not found' });
+//     }
+//     res.json({ 
+//       message: 'Product deleted successfully',
+//       productId: id
+//     });
+
+//   } catch (error) {
+//     console.error('Error in deleteProduct:', error);
+//     res.status(500).json({ 
+//       message: 'Server error deleting product', 
+//       error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+//     });
+//   }
+// };
+
+
+
+
+
+
+
+// export const deleteProduct = async (req, res) => {
+//   const connection = await pool.getConnection();
+  
+//   try {
+
+//     const { id } = req.params;
+
+//     // Check if product exists and belongs to seller (or admin)
+//     let checkQuery = 'SELECT * FROM products WHERE id = ?';
+//     const checkParams = [id];
+
+//     if (req.user.role !== 'admin') {
+//       checkQuery += ' AND seller_id = ?';
+//       checkParams.push(req.user.id);
+//     }
+
+//     const [existingProducts] = await connection.execute(checkQuery, checkParams);
+
+//     if (existingProducts.length === 0) {
+      
+//       return res.status(404).json({ 
+//         message: 'Product not found or you do not have permission to delete it' 
+//       });
+//     }
+
+//     // Check if product has any orders
+//     const [orderItems] = await connection.execute(
+//       'SELECT COUNT(*) as count FROM order_items WHERE product_id = ?',
+//       [id]
+//     );
+    
+//     if (orderItems[0].count > 0) {
+      
+//       return res.status(400).json({ 
+//         message: 'Cannot delete product because it has orders. You can archive the product instead.',
+//         has_orders: true
+//       });
+//     }
+
+//     // Delete product images first (due to foreign key constraint)
+//     await connection.execute('DELETE FROM product_images WHERE product_id = ?', [id]);
+
+//     // Delete product
+//     const [result] = await connection.execute('DELETE FROM products WHERE id = ?', [id]);
+
+//     if (result.affectedRows === 0) {
+      
+//       return res.status(404).json({ message: 'Product not found' });
+//     }
+
+    
+
+//     res.json({ 
+//       message: 'Product deleted successfully',
+//       productId: id
+//     });
+
+//   } catch (error) {
+    
+//     console.error('Error in deleteProduct:', error);
+//     res.status(500).json({ 
+//       message: 'Server error deleting product', 
+//       error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+//     });
+//   } 
+// };
+
 
 export const getCategories = async (req, res) => {
   try {
@@ -3709,7 +4060,7 @@ export const adjustStock = async (req, res) => {
   const connection = await pool.getConnection();
   
   try {
-    await connection.beginTransaction();
+
 
     const { id } = req.params;
     const { adjustment, reason = 'Manual adjustment' } = req.body;
@@ -3720,7 +4071,7 @@ export const adjustStock = async (req, res) => {
     console.log('Reason:', reason);
 
     if (adjustment === undefined || adjustment === 0) {
-      await connection.rollback();
+      
       return res.status(400).json({ 
         message: 'Valid adjustment is required and cannot be zero' 
       });
@@ -3738,7 +4089,7 @@ export const adjustStock = async (req, res) => {
     const [products] = await connection.execute(query, params);
 
     if (products.length === 0) {
-      await connection.rollback();
+      
       return res.status(404).json({ 
         message: 'Product not found or you do not have permission to adjust stock' 
       });
@@ -3750,7 +4101,7 @@ export const adjustStock = async (req, res) => {
 
     // Check if new stock is negative
     if (newStock < 0) {
-      await connection.rollback();
+      
       return res.status(400).json({ 
         message: `Insufficient stock. Available: ${currentStock}, Adjustment: ${adjustment}` 
       });
@@ -3763,7 +4114,7 @@ export const adjustStock = async (req, res) => {
     );
 
     if (result.affectedRows === 0) {
-      await connection.rollback();
+      
       return res.status(404).json({ message: 'Product not found' });
     }
 
@@ -3773,7 +4124,7 @@ export const adjustStock = async (req, res) => {
     //   [id, adjustment, reason, req.user.id]
     // );
 
-    await connection.commit();
+    
 
     res.json({
       message: `Stock ${adjustment > 0 ? 'increased' : 'decreased'} successfully`,
@@ -3786,7 +4137,7 @@ export const adjustStock = async (req, res) => {
     });
 
   } catch (error) {
-    await connection.rollback();
+    
     console.error('Error in adjustStock:', error);
     res.status(500).json({ 
       message: 'Server error adjusting stock', 
@@ -3801,12 +4152,12 @@ export const bulkAdjustStock = async (req, res) => {
   const connection = await pool.getConnection();
   
   try {
-    await connection.beginTransaction();
+
 
     const { adjustments } = req.body;
 
     if (!Array.isArray(adjustments) || adjustments.length === 0) {
-      await connection.rollback();
+      
       return res.status(400).json({ 
         message: 'Adjustments array is required' 
       });
@@ -3868,7 +4219,7 @@ export const bulkAdjustStock = async (req, res) => {
     }
 
     if (errors.length > 0) {
-      await connection.rollback();
+      
       return res.status(400).json({
         message: 'Some stock adjustments failed',
         successful: results,
@@ -3876,7 +4227,7 @@ export const bulkAdjustStock = async (req, res) => {
       });
     }
 
-    await connection.commit();
+    
 
     res.json({
       message: 'All stock adjustments completed successfully',
@@ -3884,7 +4235,7 @@ export const bulkAdjustStock = async (req, res) => {
     });
 
   } catch (error) {
-    await connection.rollback();
+    
     console.error('Error in bulkAdjustStock:', error);
     res.status(500).json({ 
       message: 'Server error adjusting stock', 

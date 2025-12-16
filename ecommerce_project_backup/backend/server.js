@@ -94,6 +94,12 @@ import dashboardRoutes from './routes/dashboard.js';
 import couponRoutes from './routes/coupons.js';
 import uploadsRouter from './routes/uploads.js';
 import deliveryRoutes from './routes/delivery.js';
+import analyticsRoutes from './routes/analytics.js';
+import categorySuggestionsRoutes from './routes/categorySuggestions.js';
+import paymentRoutes from './routes/payments.js';
+import reportRoutes from './routes/reports.js';
+import standalonePaymentsRouter from './routes/standalonePayments.js';
+
 
 dotenv.config();
 
@@ -123,6 +129,76 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/coupons', couponRoutes);
 app.use('/api', uploadsRouter);
 app.use('/api/delivery', deliveryRoutes);
+app.use('/api/analytics',analyticsRoutes);
+app.use('/api/category-suggestions', categorySuggestionsRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/reports', reportRoutes);
+app.use('/api/standalone-payments', standalonePaymentsRouter);
+
+
+
+
+// Basic routes
+app.get('/', (req, res) => {
+  res.json({
+    message: '🛒 E-commerce API is running!',
+    timestamp: new Date().toISOString(),
+    status: 'OK'
+  });
+});
+
+app.get('/api', (req, res) => {
+  res.json({
+    message: 'API Root',
+    version: '1.0.0',
+    endpoints: {
+      health: 'GET /api/health',
+      webhook: 'POST /api/payments/pawapay/webhook',
+      test: 'GET /api/payments/test-webhook'
+    }
+  });
+});
+
+
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'healthy',
+    server: 'running',
+    timestamp: new Date().toISOString()
+  });
+});
+
+
+
+// PawaPay webhook endpoint
+app.post('/api/payments/pawapay/webhook', (req, res) => {
+  console.log('📦 PawaPay Webhook Received:', {
+    headers: req.headers,
+    body: req.body,
+    timestamp: new Date().toISOString()
+  });
+  
+  res.json({
+    received: true,
+    message: 'Webhook processed successfully',
+    status: 'OK',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Test endpoint for webhooks
+app.get('/api/payments/test-webhook', (req, res) => {
+  res.json({
+    message: 'Webhook test endpoint is working!',
+    instructions: 'Use POST /api/payments/pawapay/webhook for real webhooks',
+    timestamp: new Date().toISOString()
+  });
+});
+
+
+
+
+
 
 // Debug endpoint for profile pictures
 app.get('/api/debug/profile-pictures', (req, res) => {
@@ -174,7 +250,18 @@ app.use((err, req, res, next) => {
 
 // 404 handler
 app.use('*', (req, res) => {
-  res.status(404).json({ message: 'Route not found' });
+  // res.status(404).json({ message: 'Route not found' });
+res.status(404).json({
+    error: 'Route not found',
+    path: req.originalUrl,
+    availableRoutes: [
+      'GET /',
+      'GET /api',
+      'GET /api/health',
+      'POST /api/payments/pawapay/webhook',
+      'GET /api/payments/test-webhook'
+    ]
+  });
 });
 
 const PORT = process.env.PORT || 5000;
@@ -199,4 +286,10 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Uploads directory: ${path.join(__dirname, 'uploads')}`);
   console.log(`Profile pictures served from: ${path.join(__dirname, 'uploads', 'profiles')}`);
+  console.log(`🌐 Network: http://0.0.0.0:${PORT}`);
+  console.log(`🔗 Ngrok: https://variolous-charles-previctorious.ngrok-free.dev`);
+  console.log('\n📋 Test these endpoints:');
+  console.log(`   curl https://variolous-charles-previctorious.ngrok-free.dev/`);
+  console.log(`   curl https://variolous-charles-previctorious.ngrok-free.dev/api/health`);
+  console.log(`   curl https://variolous-charles-previctorious.ngrok-free.dev/api/payments/test-webhook`);
 });

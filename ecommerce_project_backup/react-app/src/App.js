@@ -25,6 +25,11 @@ import Wishlist from './pages/customer/Wishlist';
 // import UserReviews from './pages/UserReviews';
 // import ReviewModeration from './pages/admin/ReviewModeration';
 import MyReviews from './pages/MyReviews';
+import StandalonePayment from './pages/StandalonePayment';
+import TransactionStatus from './pages/TransactionStatus';
+import PaymentHistory from './pages/PaymentHistory';
+import TransactionHistory from './pages/TransactionHistory';
+import OrderPaymentStatus from './pages/OrderPaymentStatus';
 
 function App() {
   return (
@@ -74,6 +79,27 @@ function App() {
                     <Orders />
                   </ProtectedRoute>
                 } />
+                <Route path="/send-money" element={
+                  <ProtectedRoute>
+                    <StandalonePayment />
+                  </ProtectedRoute>
+                } />
+                <Route path="/transactions/:transactionId" element={
+                  <ProtectedRoute>
+                    <TransactionStatus />
+                  </ProtectedRoute>
+                } />
+                <Route path="/payments/history" element={
+                  <ProtectedRoute>
+                    <PaymentHistory />
+                  </ProtectedRoute>
+                } />
+                <Route path="/orders/:orderId/payment" element={
+                  <ProtectedRoute>
+                    <OrderPaymentStatus />
+                  </ProtectedRoute>
+                } />
+
               </Routes>
             </main>
             <Footer />
