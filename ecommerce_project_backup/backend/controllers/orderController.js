@@ -1,6 +1,7 @@
 // backend/controllers/orderController.js
 import pool from '../config/database.js';
 import { pawapayConfig } from '../config/pawapay.js';
+import { v4 as uuidv4 } from 'uuid';
 // export const createOrder = async (req, res) => {
 //   const connection = await pool.getConnection();
   
@@ -266,7 +267,7 @@ export const createOrder = async (req, res) => {
     // Generate unique order number
     const orderNumber = 'ORD' + Date.now();
 
-    // FIXED: Create order - removed status column since it has default value
+    // Create order
     const [orderResult] = await connection.execute(
       `INSERT INTO orders (user_id, order_number, total_amount, payment_method, 
        shipping_address, billing_address, payment_status, coupon_id) 
@@ -313,7 +314,7 @@ export const createOrder = async (req, res) => {
     // Clear cart items
     await connection.execute('DELETE FROM cart_items WHERE cart_id = ?', [cartId]);
 
-    // FIXED: Check if this is a PawaPay payment method
+    // Check if this is a PawaPay payment method
     const pawaPayMethodKeys = Object.keys(pawapayConfig.paymentMethods);
     const isPawaPayMethod = pawaPayMethodKeys.includes(paymentMethod);
     
@@ -337,11 +338,63 @@ export const createOrder = async (req, res) => {
       response.paymentMethod = paymentMethod;
       response.instructions = 'Please initiate payment to complete your order';
       response.phoneNumberRequired = true;
+      
+      // Create initial payment record for mobile money orders
+      if (phoneNumber) {
+        const merchantReference = `ORDER_${orderNumber}_${Date.now()}`;
+        
+        await connection.execute(
+          `INSERT INTO payments 
+           (user_id, order_id, type, payment_method, amount, currency, 
+            deposit_id, merchant_reference, status, phone_number,
+            customer_name, customer_email, country) 
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?)`,
+          [
+            userId,
+            orderId,
+            'order_payment',
+            paymentMethod,
+            finalTotal,
+            'RWF', // Default currency for Rwanda
+            'PENDING_' + uuidv4(), // Temporary deposit ID
+            merchantReference,
+            phoneNumber,
+            `${shippingAddress.firstName} ${shippingAddress.lastName}`,
+            shippingAddress.email,
+            'RW'
+          ]
+        );
+      }
     } else {
       // For non-PawaPay methods (like credit_card), mark as paid immediately
       await connection.execute(
         'UPDATE orders SET payment_status = ?, status = ? WHERE id = ?',
         ['paid', 'confirmed', orderId]
+      );
+      
+      // Create payment record for non-mobile money payments
+      const merchantReference = `ORDER_${orderNumber}_${Date.now()}`;
+      
+      await connection.execute(
+        `INSERT INTO payments 
+         (user_id, order_id, type, payment_method, amount, currency, 
+          deposit_id, merchant_reference, status, phone_number,
+          customer_name, customer_email, country) 
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'completed', ?, ?, ?, ?)`,
+        [
+          userId,
+          orderId,
+          'order_payment',
+          paymentMethod,
+          finalTotal,
+          'USD', // Default currency for credit cards
+          'NON_MOBILE_' + uuidv4(),
+          merchantReference,
+          phoneNumber || shippingAddress.phone,
+          `${shippingAddress.firstName} ${shippingAddress.lastName}`,
+          shippingAddress.email,
+          shippingAddress.country || 'RW'
+        ]
       );
       
       response.paymentRequired = false;
@@ -954,7 +1007,7 @@ export const getSellerOrders = async (req, res) => {
        LEFT JOIN product_images pi ON p.id = pi.product_id AND pi.is_primary = TRUE
        JOIN users u ON o.user_id = u.id
        WHERE p.seller_id = ?
-       ORDER BY o.created_at DESC, oi.id ASC`,
+       ORDER BY o.status=pending, o.created_at DESC, oi.id ASC`,
       [req.user.id]
     );
 

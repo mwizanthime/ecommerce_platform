@@ -2308,14 +2308,23 @@ export const initiatePayment = async (req, res) => {
             }
             
         } else {
-            // Handle standalone payments
-            paymentAmount = parseFloat(amount);
-            if (isNaN(paymentAmount) || paymentAmount <= 0) {
-                return res.status(400).json({ 
-                    success: false,
-                    message: 'Invalid amount. Must be greater than 0' 
-                });
-            }
+           if (type === 'standalone_payment') {
+    paymentAmount = parseFloat(amount);
+    if (isNaN(paymentAmount) || paymentAmount <= 0) {
+        return res.status(400).json({ 
+            success: false,
+            message: 'Invalid amount. Must be greater than 0' 
+        });
+    }
+} else {
+    // Handle order payments (already fetched amount from order)
+    if (!paymentAmount || paymentAmount <= 0) {
+        return res.status(400).json({ 
+            success: false,
+            message: 'Invalid order amount' 
+        });
+    }
+}
         }
 
         // Format phone number
@@ -2381,33 +2390,62 @@ export const initiatePayment = async (req, res) => {
 
         // Store initial payment record
         const [paymentResult] = await connection.execute(
-            `INSERT INTO payments 
-             (user_id, order_id, type, payment_method, amount, currency, 
-              deposit_id, merchant_reference, status, provider_response, phone_number,
-              customer_name, customer_email, country) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [
-                userId,
-                type === 'order_payment' ? orderId : null,
-                type,
-                provider,
-                paymentAmount,
-                currency,
-                deposit.depositId,
-                merchantReference,
-                status,
-                JSON.stringify({
-                    ...depositResponse.data,
-                    initialStatus: pawaPayStatus,
-                    correspondent: correspondent,
-                    country: country
-                }),
-                formattedPhone,
-                customerName,
-                customerEmail,
-                country
-            ]
-        );
+    `INSERT INTO payments 
+     (user_id, order_id, type, payment_method, amount, currency, 
+      deposit_id, merchant_reference, status, provider_response, phone_number,
+      customer_name, customer_email, country) 
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+        userId,
+        type === 'order_payment' ? orderId : null,
+        type,
+        provider,
+        paymentAmount,
+        currency,
+        deposit.depositId,
+        merchantReference,
+        status,
+        JSON.stringify({
+            ...depositResponse.data,
+            initialStatus: pawaPayStatus,
+            correspondent: correspondent,
+            country: country
+        }),
+        formattedPhone,
+        customerName,
+        customerEmail,
+        country
+    ]
+);
+
+        // ALSO create a transaction record for legacy support
+const [transactionResult] = await connection.execute(
+  `INSERT INTO transactions 
+   (user_id, order_id, provider, amount, currency, phone_number, 
+    status, merchant_reference, transaction_id, provider_response, type) 
+   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+  [
+    userId,
+    type === 'order_payment' ? orderId : null,
+    provider,
+    paymentAmount,
+    currency,
+    formattedPhone,
+    status,
+    merchantReference,
+    deposit.depositId,
+    JSON.stringify({
+      depositId: deposit.depositId,
+      status: status,
+      amount: paymentAmount,
+      currency: currency,
+      phoneNumber: formattedPhone
+    }),
+    type
+  ]
+);
+
+console.log(`✅ Payment saved to both tables. Payment ID: ${paymentResult.insertId}, Transaction ID: ${transactionResult.insertId}`);
 
         // Update order if order payment
         if (type === 'order_payment' && orderDetails) {
@@ -2914,11 +2952,12 @@ export const sendDeposit = async (deposit) => {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${process.env.PAWAPAY_API_KEY || pawapayConfig.apiKey}`
         },
-        timeout: 30000 // 30 second timeout
+        timeout: 30000
     };
     
     const url = `${process.env.PAWAPAY_API_URL || pawapayConfig.baseUrl}/deposits`;
     
+    // CORRECTED: Amount should be an object, not a string
     const dataBlock = {
         depositId: deposit.depositId,
         amount: {
@@ -2929,14 +2968,18 @@ export const sendDeposit = async (deposit) => {
         payer: {
             type: deposit.payer.type,
             address: {
-                value: deposit.payer.address.value,
+                value: deposit.payer.address.value
             }
         },
         customerTimestamp: deposit.customerTimestamp,
         statementDescription: deposit.statementDescription
     };
     
-    console.log('📤 Sending deposit to PawaPay:', { url, dataBlock });
+    console.log('📤 Sending deposit to PawaPay:', { 
+        url, 
+        dataBlock,
+        headers: config.headers 
+    });
     
     return await retryApiCall(async () => {
         return await axios.post(url, dataBlock, config);
@@ -3291,6 +3334,25 @@ export const handlePaymentWebhook = async (req, res) => {
             ]
         );
 
+        // Update transactions table
+await connection.execute(
+  `UPDATE transactions 
+   SET status = ?, transaction_id = ?, provider_response = JSON_MERGE_PATCH(provider_response, ?), 
+       updated_at = NOW()
+   WHERE merchant_reference = ? OR transaction_id = ?`,
+  [
+    paymentStatus,
+    webhookPayload.transactionId || depositId,
+    JSON.stringify({
+      webhookEvent: event,
+      webhookData: webhookPayload,
+      webhookReceived: new Date().toISOString()
+    }),
+    payment.merchant_reference,
+    depositId
+  ]
+);
+
         // Update order if this is an order payment
         if (payment.type === 'order_payment' && payment.order_id) {
             await connection.execute(
@@ -3635,6 +3697,172 @@ function getProviderIcon(provider) {
     };
     return icons[provider] || '💸';
 }
+
+
+
+
+// Add this to paymentController.js
+export const syncPaymentData = async (req, res) => {
+  try {
+    const connection = await pool.getConnection();
+    
+    // Find payments missing in transactions table
+    const [missingPayments] = await connection.execute(`
+      SELECT p.* FROM payments p
+      LEFT JOIN transactions t ON p.deposit_id = t.transaction_id OR p.merchant_reference = t.merchant_reference
+      WHERE t.id IS NULL AND p.created_at > DATE_SUB(NOW(), INTERVAL 30 DAY)
+    `);
+    
+    for (const payment of missingPayments) {
+      await connection.execute(
+        `INSERT INTO transactions 
+         (user_id, order_id, provider, amount, currency, phone_number, 
+          status, merchant_reference, transaction_id, provider_response, type, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          payment.user_id,
+          payment.order_id,
+          payment.payment_method,
+          payment.amount,
+          payment.currency,
+          payment.phone_number,
+          payment.status,
+          payment.merchant_reference,
+          payment.deposit_id,
+          payment.provider_response,
+          payment.type,
+          payment.created_at,
+          payment.updated_at
+        ]
+      );
+    }
+    
+    connection.release();
+    
+    res.json({
+      success: true,
+      message: `Synced ${missingPayments.length} payments to transactions table`,
+      synced: missingPayments.length
+    });
+    
+  } catch (error) {
+    console.error('Sync error:', error);
+    res.status(500).json({ success: false, message: 'Sync failed' });
+  }
+};
+
+
+// Add test endpoint
+export const testPaymentSetup = async (req, res) => {
+    try {
+        res.json({
+            success: true,
+            message: 'Payment system is operational',
+            config: {
+                baseUrl: pawapayConfig.baseUrl,
+                paymentMethods: Object.keys(pawapayConfig.paymentMethods),
+                countries: pawapayConfig.countries,
+                environment: process.env.NODE_ENV
+            },
+            testData: {
+                depositId: uuidv4(),
+                amount: "1000.00",
+                currency: "RWF",
+                correspondent: "MTN_MOMO_RWA",
+                phoneNumber: "+250788123456"
+            }
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Payment setup test failed',
+            error: error.message
+        });
+    }
+};
+
+
+
+// Add this function to check and update existing payments
+export const checkExistingPayment = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const userId = req.user.id;
+
+    const [payments] = await pool.execute(
+      `SELECT p.*, o.order_number, o.status as order_status, o.payment_status as order_payment_status
+       FROM payments p 
+       JOIN orders o ON p.order_id = o.id 
+       WHERE p.order_id = ? AND p.user_id = ?`,
+      [orderId, userId]
+    );
+
+    if (payments.length > 0) {
+      res.json({
+        success: true,
+        hasPayment: true,
+        payment: payments[0]
+      });
+    } else {
+      res.json({
+        success: true,
+        hasPayment: false,
+        message: 'No payment found for this order'
+      });
+    }
+  } catch (error) {
+    console.error('Check existing payment error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to check payment status'
+    });
+  }
+};
+
+
+
+
+// Mock webhook for testing
+export const mockWebhook = async (req, res) => {
+    try {
+        const { depositId, status = 'completed' } = req.body;
+        
+        // Simulate webhook processing
+        console.log(`🔄 Mock webhook received for ${depositId}: ${status}`);
+        
+        // Update payment status
+        const [payments] = await pool.execute(
+            'SELECT * FROM payments WHERE deposit_id = ?',
+            [depositId]
+        );
+        
+        if (payments.length > 0) {
+            await pool.execute(
+                'UPDATE payments SET status = ?, updated_at = NOW() WHERE deposit_id = ?',
+                [status, depositId]
+            );
+            
+            // Update order if needed
+            if (payments[0].order_id) {
+                await pool.execute(
+                    'UPDATE orders SET payment_status = ?, status = ? WHERE id = ?',
+                    [status === 'completed' ? 'paid' : status, 
+                     status === 'completed' ? 'confirmed' : 'pending',
+                     payments[0].order_id]
+                );
+            }
+        }
+        
+        res.json({
+            success: true,
+            message: `Mock webhook processed for ${depositId}`,
+            status: status
+        });
+    } catch (error) {
+        console.error('Mock webhook error:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
 
 // Export config for use in other files
 export { pawapayConfig };

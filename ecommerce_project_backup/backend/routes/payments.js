@@ -57,8 +57,8 @@ import {
   initiatePayment,
   handlePaymentWebhook,
   checkPaymentStatus,
-  getPaymentHistory,
-  getSupportedPaymentMethods
+  getPaymentHistory,checkExistingPayment,
+  getSupportedPaymentMethods,testPaymentSetup,mockWebhook,syncPaymentData
 } from '../controllers/paymentController.js';
 import { authenticate } from '../middleware/auth.js';
 
@@ -104,5 +104,10 @@ router.get('/deposit/:depositId', authenticate, async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });
+
+router.get('/test', authenticate, testPaymentSetup);
+router.post('/mock-webhook', mockWebhook);
+router.post('/sync', authenticate, syncPaymentData);
+router.get('/check/:orderId', authenticate, checkExistingPayment);
 
 export default router;
